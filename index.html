@@ -1,94 +1,574 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>  
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Instagram Recovery Support</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
-html{scroll-behavior:smooth}
-body{
-background:linear-gradient(-45deg,#0f172a,#1e293b,#312e81,#7c3aed);
-background-size:400% 400%;
-animation:bg 15s ease infinite;
-color:white;padding:20px}
-@keyframes bg{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.container{max-width:1100px;margin:auto;background:rgba(255,255,255,.08);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.15);border-radius:30px;padding:35px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
-.hero{text-align:center;padding:20px}
-.hero h1{font-size:48px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin:30px 0}
-.stat{background:rgba(255,255,255,.08);padding:25px;border-radius:20px;text-align:center;transition:.3s}
-.stat:hover,.team-card:hover{transform:translateY(-8px)}
-form input,form textarea,form select{width:100%;padding:15px;margin:8px 0;border-radius:14px;border:none;background:rgba(255,255,255,.12);color:white}
-form select option{color:black}
-button{width:100%;padding:18px;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:white}
-.team{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:40px}
-.team-card{width:260px;text-decoration:none;color:white;background:rgba(255,255,255,.08);padding:20px;border-radius:20px;text-align:center;transition:.3s}
-.team-card img{width:130px;height:130px;border-radius:50%;object-fit:cover}
-.notice{margin-top:25px;padding:15px;border-radius:15px;background:rgba(255,255,255,.08)}
-@media(max-width:768px){.hero h1{font-size:32px}}
-</style>
-</head>
-<body>
-<div class="container">
-<div class="hero">
-<h1>Instagram Recovery Support</h1>
-<p>Professional guidance for account recovery requests</p>
-</div>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>REDX</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <svg aria-hidden="true" class="icon-sprite">
+      <symbol id="icon-home" viewBox="0 0 24 24">
+        <path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.9"/>
+        <path d="m16.5 16.5 4 4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-reels" viewBox="0 0 24 24">
+        <rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.9"/>
+        <path d="m8 4 4 6M14 4l4 6M4 10h16M10 14l5 3-5 3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-user" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/>
+        <path d="M4.5 21a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-heart" viewBox="0 0 24 24">
+        <path d="M20.5 5.9c-2-2.2-5.3-1.5-6.8.7L12 9l-1.7-2.4C8.8 4.4 5.5 3.7 3.5 5.9 1.4 8.3 2 12 4.5 14.3L12 21l7.5-6.7c2.5-2.3 3.1-6 .9-8.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-comment" viewBox="0 0 24 24">
+        <path d="M5 5.5h14v10H9l-4 4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-send" viewBox="0 0 24 24">
+        <path d="M21 3 10.5 21l-2-8.5L3 10z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-message" viewBox="0 0 24 24">
+        <path d="M4 5.5h16v10.5H8.5L4 20z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+        <path d="M8 9h8M8 12.5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-bell" viewBox="0 0 24 24">
+        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M10 21a2.5 2.5 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-repost" viewBox="0 0 24 24">
+        <path d="M7 7h10a4 4 0 0 1 4 4v1M7 7l3-3M7 7l3 3M17 17H7a4 4 0 0 1-4-4v-1M17 17l-3 3M17 17l-3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-bookmark" viewBox="0 0 24 24">
+        <path d="M7 4h10v17l-5-3-5 3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-dots" viewBox="0 0 24 24">
+        <circle cx="5" cy="12" r="1.8" fill="currentColor"/>
+        <circle cx="12" cy="12" r="1.8" fill="currentColor"/>
+        <circle cx="19" cy="12" r="1.8" fill="currentColor"/>
+      </symbol>
+      <symbol id="icon-x" viewBox="0 0 24 24">
+        <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-camera" viewBox="0 0 24 24">
+        <path d="M4 8h4l1.5-2h5L16 8h4v11H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+        <circle cx="12" cy="13.5" r="3.3" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24">
+        <path d="M12 8.2a3.8 3.8 0 1 1 0 7.6 3.8 3.8 0 0 1 0-7.6z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M19.4 13.5a7.9 7.9 0 0 0 0-3l2-1.5-2-3.5-2.4 1a8.2 8.2 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.6A8.2 8.2 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.9 7.9 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a8.2 8.2 0 0 0 2.6 1.5l.4 2.6h4l.4-2.6a8.2 8.2 0 0 0 2.6-1.5l2.4 1 2-3.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-back" viewBox="0 0 24 24">
+        <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+    </svg>
 
-<div class="stats">
-<div class="stat"><h2>500+</h2><p>Cases Reviewed</p></div>
-<div class="stat"><h2>24/7</h2><p>Support Available</p></div>
-<div class="stat"><h2>Fast</h2><p>Response Time</p></div>
-</div>
-<form action="https://formspree.io/f/mnjyzord" method="POST">
+    <section class="auth-screen" id="authScreen" aria-label="REDX login">
+      <div class="auth-stack">
+        <div class="auth-header">
+          <button class="auth-back" type="button" id="authBack" aria-label="Back">
+            <svg><use href="#icon-back"></use></svg>
+          </button>
+          <h1 id="authTitle">Log into REDX</h1>
+        </div>
+        <div class="auth-panel">
+          <form class="auth-form" id="loginForm">
+            <input id="loginId" autocomplete="username" placeholder="Phone number or username" required>
+            <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" required>
+            <button class="publish-button" type="submit">Log In</button>
+            <button class="text-button forgot-button" type="button" id="forgotPassword">Forgot password?</button>
+          </form>
+          <form class="auth-form hidden" id="signupForm">
+            <input id="signupEmail" autocomplete="tel" inputmode="tel" placeholder="Mobile number (+1 317 555 0100)" required>
+            <input id="signupName" autocomplete="name" placeholder="Full name" required>
+            <input id="signupUsername" autocomplete="username" placeholder="Username" required>
+            <small class="username-status" id="signupUsernameStatus">Username must be unique.</small>
+            <input id="signupPassword" type="password" autocomplete="new-password" minlength="4" placeholder="Password" required>
+            <button class="publish-button" type="submit">Sign Up</button>
+          </form>
+          <form class="auth-form hidden" id="resetForm">
+            <p class="auth-help">Enter your REDX username or mobile number. REDX will send an SMS code before changing the password.</p>
+            <input id="resetContact" autocomplete="username" placeholder="Mobile number or username" required>
+            <input id="resetPassword" type="password" autocomplete="new-password" minlength="4" placeholder="New password" required>
+            <input id="resetPasswordConfirm" type="password" autocomplete="new-password" minlength="4" placeholder="Confirm new password" required>
+            <button class="publish-button" type="submit">Send reset code</button>
+          </form>
+          <form class="auth-form hidden" id="otpForm">
+            <p class="auth-help" id="otpHelp">Enter the 6-digit SMS security code.</p>
+            <div class="otp-demo" id="otpDemo"></div>
+            <input id="otpInput" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Security code" required>
+            <button class="publish-button" type="submit">Verify</button>
+            <button class="text-button forgot-button" type="button" id="resendOtp">Resend code</button>
+            <button class="text-button forgot-button" type="button" id="cancelOtp">Use different login</button>
+          </form>
+        </div>
+        <button class="create-account-button" type="button" id="authModeButton">Create new account</button>
+        <div class="auth-footer"><span>REDX</span></div>
+        <span class="auth-switch" id="authSwitchText">Don't have an account?</span>
+      </div>
+    </section>
 
-    <input type="text" name="fullname" placeholder="Full Name" required>
+    <div class="mobile-topbar">
+      <button class="icon-button" data-view="search" title="Search" aria-label="Search">
+        <svg><use href="#icon-search"></use></svg>
+      </button>
+      <div class="wordmark"><span>RED</span><b>X</b></div>
+      <button class="icon-button create-trigger" title="Create" aria-label="Create post">
+        <svg><use href="#icon-plus"></use></svg>
+      </button>
+    </div>
 
-    <input type="email" name="email" placeholder="Email Address" required>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary">
+        <div class="brand-block">
+          <div class="brand-mark">X</div>
+          <div class="wordmark"><span>RED</span><b>X</b></div>
+        </div>
+        <nav class="side-nav">
+          <button class="nav-button active" data-view="feed">
+            <svg><use href="#icon-home"></use></svg>
+            <span>Feed</span>
+          </button>
+          <button class="nav-button" data-view="search">
+            <svg><use href="#icon-search"></use></svg>
+            <span>Explore</span>
+          </button>
+          <button class="nav-button" data-view="reels">
+            <svg><use href="#icon-reels"></use></svg>
+            <span>Reels</span>
+          </button>
+          <button class="nav-button" data-view="messages">
+            <svg><use href="#icon-message"></use></svg>
+            <span>Messages</span>
+          </button>
+          <button class="nav-button" data-view="notifications">
+            <svg><use href="#icon-bell"></use></svg>
+            <span>Notifications</span>
+          </button>
+          <button class="nav-button" data-view="profile">
+            <svg><use href="#icon-user"></use></svg>
+            <span>Profile</span>
+          </button>
+          <button class="nav-button account-trigger">
+            <svg><use href="#icon-user"></use></svg>
+            <span>Account</span>
+          </button>
+          <button class="nav-button settings-trigger">
+            <svg><use href="#icon-settings"></use></svg>
+            <span>Settings</span>
+          </button>
+        </nav>
+        <button class="primary-action create-trigger">
+          <svg><use href="#icon-plus"></use></svg>
+          <span>Create</span>
+        </button>
+      </aside>
 
-    <input type="text" name="instagram_username" placeholder="Instagram Username" required>
+      <main class="main-stage">
+        <section class="view active" id="feedView" aria-label="Feed">
+          <div class="stories" id="stories"></div>
+          <div class="composer-bar">
+            <button class="avatar avatar-me create-trigger" aria-label="Create post"></button>
+            <button class="composer-prompt create-trigger">What's happening on REDX?</button>
+            <button class="icon-button create-trigger" title="Camera" aria-label="Camera">
+              <svg><use href="#icon-camera"></use></svg>
+            </button>
+          </div>
+          <div class="feed" id="feed"></div>
+        </section>
 
-    <input type="tel" name="phone" placeholder="Phone Number (Optional)">
+        <section class="view" id="searchView" aria-label="Explore">
+          <div class="search-shell">
+            <label class="search-box">
+              <svg><use href="#icon-search"></use></svg>
+              <input id="searchInput" type="search" placeholder="Search REDX" autocomplete="off">
+            </label>
+            <div class="tag-row" id="tagRow"></div>
+          </div>
+          <div class="user-results" id="userResults"></div>
+          <div class="explore-grid" id="exploreGrid"></div>
+        </section>
 
-    <select name="issue" required>
-        <option value="">Select Issue Type</option>
-        <option value="Suspended Account">Suspended Account</option>
-        <option value="Disabled Account">Disabled Account</option>
-        <option value="Cannot Login">Cannot Login</option>
-        <option value="Other Issue">Other Issue</option>
-    </select>
-<textarea name="details" placeholder="Describe your issue" rows="5" required></textarea>
+        <section class="view" id="reelsView" aria-label="Reels">
+          <div class="reels-stack" id="reelsStack"></div>
+        </section>
 
-<label>📷 Upload Screenshot (Optional)</label>
-<input type="file" name="screenshot" accept="image/*">
+        <section class="view" id="messagesView" aria-label="Messages">
+          <div class="messages-shell">
+            <div class="message-list">
+              <div class="message-inbox-head">
+                <h2 id="messageOwner">Messages</h2>
+                <button class="icon-button" type="button" data-new-message title="New message" aria-label="New message">
+                  <svg><use href="#icon-plus"></use></svg>
+                </button>
+              </div>
+              <div class="message-tabs">
+                <button class="active" type="button">Primary</button>
+                <button type="button">General</button>
+                <button type="button">Requests</button>
+              </div>
+              <label class="message-search">
+                <svg><use href="#icon-search"></use></svg>
+                <input id="messageSearchInput" type="search" placeholder="Search" autocomplete="off">
+              </label>
+              <div id="messageList"></div>
+            </div>
+            <div class="chat-panel">
+              <div class="chat-head" id="chatHead"></div>
+              <div class="chat-log" id="chatLog"></div>
+              <form class="chat-form" id="messageForm">
+                <input id="messageInput" autocomplete="off" maxlength="220" placeholder="Message...">
+                <button type="submit">Send</button>
+              </form>
+            </div>
+          </div>
+        </section>
 
-<button type="submit">Submit Request</button>
+        <section class="view" id="notificationsView" aria-label="Notifications">
+          <div class="notifications-panel">
+            <h1>Notifications</h1>
+            <div class="notification-filters" aria-label="Notification filters">
+              <button class="active" type="button">All</button>
+              <button type="button">People you follow</button>
+              <button type="button">Comments</button>
+              <button type="button">Follows</button>
+            </div>
+            <div id="notificationList"></div>
+          </div>
+        </section>
 
-</form>
+        <section class="view" id="profileView" aria-label="Profile">
+          <div class="profile-head">
+            <div class="profile-avatar avatar avatar-me" id="profileAvatar"></div>
+            <div class="profile-copy">
+              <div class="profile-title">
+                <div class="profile-name-row">
+                  <h1 id="profileUsername">redx.creator</h1>
+                  <button class="icon-button settings-trigger" type="button" title="Settings" aria-label="Settings">
+                    <svg><use href="#icon-settings"></use></svg>
+                  </button>
+                </div>
+                <div class="profile-actions">
+                  <button class="outline-button account-trigger">Edit profile</button>
+                  <button class="outline-button" type="button" data-view-archive>View archive</button>
+                </div>
+              </div>
+              <div class="stats">
+                <span><b id="postCount">0</b> posts</span>
+                <span><b id="followerCount">0</b> followers</span>
+                <span><b id="followingCount">0</b> following</span>
+              </div>
+              <p id="profileBio">Fast moments. Real signals. Built on REDX.</p>
+            </div>
+          </div>
+          <div class="profile-tabs">
+            <button class="active" data-profile-tab="posts">Posts</button>
+            <button data-profile-tab="reposts">Reposts</button>
+            <button data-profile-tab="saved">Saved</button>
+          </div>
+          <div class="profile-connections" id="profileConnections"></div>
+          <div class="profile-grid" id="profileGrid"></div>
+        </section>
+      </main>
 
-<div class="notice">
-<b>Privacy Notice:</b> We will ask for Instagram passwords for login credentials.
-</div>
+      <aside class="right-rail">
+        <button class="rail-profile account-trigger">
+          <div class="avatar avatar-me" id="railAvatar"></div>
+          <div>
+            <strong id="railUsername">redx.creator</strong>
+            <span id="railName">REDX Studio</span>
+          </div>
+        </button>
+        <div class="pulse-panel">
+          <h2>Live Pulse</h2>
+          <div class="pulse-row"><span class="pulse-dot"></span><strong id="pulseCount">0</strong><span id="pulseLabel">posts today</span></div>
+          <div class="meter"><i id="pulseMeter" style="width: 0%"></i></div>
+          <div class="trend-list" id="pulseTags">
+            <span class="trend-empty">No trends yet</span>
+          </div>
+        </div>
+        <div class="suggest-panel">
+          <h2>Suggested for You</h2>
+          <div id="suggestions"></div>
+        </div>
+        <div class="suggest-panel">
+          <h2>Followers</h2>
+          <div id="followersList"></div>
+        </div>
+      </aside>
+    </div>
 
-<h2 style="text-align:center;margin-top:40px">Our Team</h2>
+    <div class="create-menu" id="createMenu" aria-label="Create menu" hidden>
+      <button type="button" data-create-option="post">
+        <span>Post</span>
+        <svg><use href="#icon-camera"></use></svg>
+      </button>
+      <button type="button" data-create-option="live">
+        <span>Live video</span>
+        <svg><use href="#icon-reels"></use></svg>
+      </button>
+      <button type="button" data-create-option="ad">
+        <span>Ad</span>
+        <svg><use href="#icon-send"></use></svg>
+      </button>
+    </div>
 
-<div class="team">
-<a class="team-card" href="https://www.instagram.com/gentlex.tanbir/" target="_blank">
-<img src="tanbir.jpg" alt="Manager">
-<h3>Tanbir</h3>
-<p>Manager</p>
-<p>@gentlex.tanbir</p>
-</a>
+    <button class="floating-messages" type="button" data-view="messages" aria-label="Open messages">
+      <svg><use href="#icon-message"></use></svg>
+      <strong>Messages</strong>
+      <span class="message-badge">3</span>
+    </button>
 
-<a class="team-card" href="https://www.instagram.com/_nakoto0x/" target="_blank">
-<img src="danger.jpg" alt="Admin">
-<h3>Manish</h3>
-<p>Admin</p>
-<p>@_nakoto0x</p>
-</a>
-</div>
-</div>
-</body>
+    <nav class="bottom-nav" aria-label="Mobile primary">
+      <button class="tab-button active" data-view="feed" title="Feed" aria-label="Feed">
+        <svg><use href="#icon-home"></use></svg>
+      </button>
+      <button class="tab-button" data-view="search" title="Explore" aria-label="Explore">
+        <svg><use href="#icon-search"></use></svg>
+      </button>
+      <button class="tab-button create-trigger" title="Create" aria-label="Create post">
+        <svg><use href="#icon-plus"></use></svg>
+      </button>
+      <button class="tab-button" data-view="reels" title="Reels" aria-label="Reels">
+        <svg><use href="#icon-reels"></use></svg>
+      </button>
+      <button class="tab-button" data-view="messages" title="Messages" aria-label="Messages">
+        <svg><use href="#icon-message"></use></svg>
+      </button>
+      <button class="tab-button" data-view="notifications" title="Notifications" aria-label="Notifications">
+        <svg><use href="#icon-bell"></use></svg>
+      </button>
+      <button class="tab-button" data-view="profile" title="Profile" aria-label="Profile">
+        <svg><use href="#icon-user"></use></svg>
+      </button>
+    </nav>
+
+    <dialog class="create-dialog" id="createDialog" aria-labelledby="createTitle">
+      <form method="dialog" class="create-form" id="createForm">
+        <div class="dialog-head">
+          <h2 id="createTitle">Create Post</h2>
+          <button class="icon-button" value="cancel" type="button" id="closeDialog" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <div class="selected-preview media-preview" id="selectedPreview"></div>
+        <label class="upload-card">
+          <input id="photoInput" type="file" accept="image/*,video/*">
+          <span class="upload-thumb"><svg><use href="#icon-camera"></use></svg></span>
+          <span>
+            <strong>Upload Photo or Video</strong>
+            <small id="photoStatus">Choose from your device</small>
+          </span>
+        </label>
+        <div class="asset-picker" id="assetPicker" aria-label="Photo choices" hidden></div>
+        <label class="caption-field">
+          <span>Caption</span>
+          <textarea id="captionInput" rows="4" maxlength="180" placeholder="Drop a moment..."></textarea>
+        </label>
+        <button class="publish-button" type="submit">Publish</button>
+      </form>
+    </dialog>
+
+    <dialog class="create-dialog live-dialog" id="liveDialog" aria-labelledby="liveTitle">
+      <div class="create-form">
+        <div class="dialog-head">
+          <h2 id="liveTitle">Go Live</h2>
+          <button class="icon-button" type="button" id="closeLiveDialog" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <div class="live-preview">
+          <video id="livePreview" autoplay muted playsinline></video>
+          <div class="live-placeholder" id="livePlaceholder">
+            <svg><use href="#icon-reels"></use></svg>
+            <span>Camera preview</span>
+          </div>
+          <span class="live-chip" id="liveChip" hidden>LIVE</span>
+        </div>
+        <label class="caption-field">
+          <span>Live title</span>
+          <input id="liveTitleInput" maxlength="70" placeholder="What's this live about?">
+        </label>
+        <div class="live-actions">
+          <button class="publish-button" type="button" id="startLiveButton">Go Live</button>
+          <button class="outline-button danger-button" type="button" id="endLiveButton" disabled>End Live</button>
+        </div>
+        <p class="live-status" id="liveStatus">Ready</p>
+      </div>
+    </dialog>
+
+    <dialog class="create-dialog live-watch-dialog" id="liveWatchDialog" aria-labelledby="liveWatchTitle">
+      <div class="create-form">
+        <div class="dialog-head">
+          <h2 id="liveWatchTitle">Watching Live</h2>
+          <button class="icon-button" type="button" id="closeLiveWatchDialog" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <div class="live-preview">
+          <video id="liveWatchVideo" autoplay playsinline controls></video>
+          <div class="live-placeholder" id="liveWatchPlaceholder">
+            <svg><use href="#icon-reels"></use></svg>
+            <span>Connecting to live video</span>
+          </div>
+          <span class="live-chip">LIVE</span>
+        </div>
+        <p class="live-status" id="liveWatchStatus">Waiting for broadcaster...</p>
+      </div>
+    </dialog>
+
+    <dialog class="create-dialog story-dialog" id="storyDialog" aria-labelledby="storyTitle">
+      <form method="dialog" class="create-form" id="storyForm">
+        <div class="dialog-head">
+          <h2 id="storyTitle">Add Story</h2>
+          <button class="icon-button" value="cancel" type="button" id="closeStoryDialog" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <div class="selected-preview story-preview media-preview" id="storyPreview"></div>
+        <label class="upload-card">
+          <input id="storyInput" type="file" accept="image/*,video/*">
+          <span class="upload-thumb"><svg><use href="#icon-camera"></use></svg></span>
+          <span>
+            <strong>Upload Story</strong>
+            <small id="storyStatus">Choose a photo or video for 24 hours</small>
+          </span>
+        </label>
+        <label class="caption-field">
+          <span>Story Text</span>
+          <input id="storyCaptionInput" maxlength="80" placeholder="Add a short note">
+        </label>
+        <button class="publish-button" type="submit">Share Story</button>
+      </form>
+    </dialog>
+
+    <dialog class="story-viewer" id="storyViewer" aria-label="Story viewer">
+      <div class="story-viewer-inner">
+        <div class="story-viewer-head">
+          <div class="author" id="storyViewerAuthor"></div>
+          <button class="icon-button" type="button" id="closeStoryViewer" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <div class="story-viewer-media" id="storyViewerMedia"></div>
+        <p id="storyViewerCaption"></p>
+      </div>
+    </dialog>
+
+    <dialog class="create-dialog profile-dialog" id="profileDialog" aria-label="Profile preview">
+      <div class="profile-dialog-inner">
+        <div class="dialog-head">
+          <h2 id="profileDialogName">Profile</h2>
+          <button class="icon-button" type="button" id="closeProfileDialog" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <div class="profile-head compact-profile">
+          <div class="profile-avatar avatar avatar-me" id="profileDialogAvatar"></div>
+          <div class="profile-copy">
+            <div class="stats">
+              <span><b id="profileDialogPosts">0</b> posts</span>
+              <span><b id="profileDialogFollowers">0</b> followers</span>
+              <span><b id="profileDialogFollowing">0</b> following</span>
+            </div>
+            <p id="profileDialogBio"></p>
+            <div class="profile-dialog-actions">
+              <button class="outline-button" type="button" id="profileDialogFollow">Follow</button>
+              <button class="outline-button" type="button" id="profileDialogMessage">Message</button>
+            </div>
+          </div>
+        </div>
+        <div class="profile-grid" id="profileDialogGrid"></div>
+      </div>
+    </dialog>
+
+    <dialog class="create-dialog account-dialog" id="accountDialog" aria-labelledby="accountTitle">
+      <form method="dialog" class="create-form" id="accountForm">
+        <div class="dialog-head">
+          <h2 id="accountTitle">Create Account</h2>
+          <button class="icon-button" value="cancel" type="button" id="closeAccountDialog" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <label class="upload-card profile-upload">
+          <input id="avatarInput" type="file" accept="image/*">
+          <span class="avatar avatar-me" id="avatarPreview"></span>
+          <span>
+            <strong>Profile Photo</strong>
+            <small id="avatarStatus">Choose a real picture</small>
+          </span>
+        </label>
+        <label class="caption-field">
+          <span>Username</span>
+          <input id="usernameInput" maxlength="24" placeholder="yourname" autocomplete="username">
+        </label>
+        <label class="caption-field">
+          <span>Display Name</span>
+          <input id="nameInput" maxlength="32" placeholder="Your name" autocomplete="name">
+        </label>
+        <label class="caption-field">
+          <span>Bio</span>
+          <textarea id="bioInput" rows="3" maxlength="120" placeholder="Say something short..."></textarea>
+        </label>
+        <button class="publish-button" type="submit">Save Account</button>
+      </form>
+    </dialog>
+
+    <dialog class="create-dialog settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+      <form method="dialog" class="create-form" id="settingsForm">
+        <div class="dialog-head">
+          <h2 id="settingsTitle">Settings</h2>
+          <button class="icon-button" value="cancel" type="button" id="closeSettingsDialog" title="Close" aria-label="Close">
+            <svg><use href="#icon-x"></use></svg>
+          </button>
+        </div>
+        <div class="settings-list">
+          <label class="setting-row">
+            <span><strong>Private Account</strong><small>Only approved followers see your posts.</small></span>
+            <input id="privateInput" type="checkbox">
+          </label>
+          <label class="setting-row">
+            <span><strong>Show Activity Status</strong><small>Let people see when you are active.</small></span>
+            <input id="activityInput" type="checkbox">
+          </label>
+          <label class="setting-row">
+            <span><strong>Push Notifications</strong><small>Likes, comments, follows, and messages.</small></span>
+            <input id="notificationsInput" type="checkbox">
+          </label>
+          <label class="setting-row">
+            <span><strong>Hide Like Counts</strong><small>Reduce public like counters in your feed.</small></span>
+            <input id="hideLikesInput" type="checkbox">
+          </label>
+          <label class="setting-row">
+            <span><strong>Dark Mode</strong><small>Use a darker REDX interface.</small></span>
+            <input id="darkModeInput" type="checkbox">
+          </label>
+        </div>
+        <label class="caption-field">
+          <span>Blocked Accounts</span>
+          <input id="blockedInput" placeholder="comma separated usernames">
+        </label>
+        <label class="caption-field">
+          <span>Muted Words</span>
+          <input id="mutedInput" placeholder="comma separated words">
+        </label>
+        <div class="settings-actions">
+          <button class="outline-button danger-button" type="button" id="resetDemo">Reset REDX</button>
+          <button class="outline-button" type="button" id="logoutButton">Log Out</button>
+          <button class="publish-button" type="submit">Save Settings</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
 </html>
