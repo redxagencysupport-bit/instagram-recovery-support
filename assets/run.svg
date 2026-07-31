@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-label="Running shoes on pavement">
+  <defs>
+    <linearGradient id="pavement" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d6e4ff"/>
+      <stop offset="1" stop-color="#2c364a"/>
+    </linearGradient>
+    <linearGradient id="shoe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8f5ee"/>
+      <stop offset="1" stop-color="#b6c1cf"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#pavement)"/>
+  <g stroke="#ffffff" stroke-width="14" opacity=".35">
+    <path d="M-40 930 H1240"/>
+    <path d="M-40 710 H1240"/>
+    <path d="M-40 490 H1240"/>
+    <path d="M-40 270 H1240"/>
+  </g>
+  <path d="M622 0 C552 202 568 355 680 505" fill="none" stroke="#ff304f" stroke-width="72" stroke-linecap="round" opacity=".86"/>
+  <path d="M386 0 C466 188 450 350 328 488" fill="none" stroke="#111827" stroke-width="70" stroke-linecap="round" opacity=".88"/>
+  <g transform="translate(284 540) rotate(-17)">
+    <path d="M0 134 C95 48 223 26 389 74 C504 108 593 172 650 258 C541 314 320 326 148 286 C42 262 -18 213 0 134 Z" fill="url(#shoe)"/>
+    <path d="M408 83 C511 127 589 185 650 258 C601 283 525 300 434 306 C388 224 369 153 408 83 Z" fill="#23b7a7"/>
+    <path d="M82 222 C240 270 444 279 618 236" fill="none" stroke="#141722" stroke-width="24" stroke-linecap="round"/>
+    <path d="M166 135 L312 164 M202 100 L350 130 M252 77 L392 108" stroke="#ff304f" stroke-width="18" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(515 710) rotate(12)">
+    <path d="M0 134 C95 48 223 26 389 74 C504 108 593 172 650 258 C541 314 320 326 148 286 C42 262 -18 213 0 134 Z" fill="url(#shoe)"/>
+    <path d="M408 83 C511 127 589 185 650 258 C601 283 525 300 434 306 C388 224 369 153 408 83 Z" fill="#f2b544"/>
+    <path d="M82 222 C240 270 444 279 618 236" fill="none" stroke="#141722" stroke-width="24" stroke-linecap="round"/>
+    <path d="M166 135 L312 164 M202 100 L350 130 M252 77 L392 108" stroke="#ff304f" stroke-width="18" stroke-linecap="round"/>
+  </g>
+</svg>
