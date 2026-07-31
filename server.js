@@ -19,8 +19,10 @@ loadEnvFile(envPath);
 
 const port = Number(process.env.PORT || 3000);
 const devOtpEnabled = String(process.env.REDX_DEV_OTP || "").toLowerCase() === "true";
+const requireSmsOtp = String(process.env.REDX_REQUIRE_SMS_OTP || "").toLowerCase() === "true";
 const httpsOptions = readHttpsOptions();
 const serverProtocol = httpsOptions ? "https" : "http";
+let googleKeysCache = { expiresAt: 0, keys: [] };
 
 db.exec(`
   PRAGMA journal_mode = WAL;
@@ -417,6 +419,10 @@ function smsProviderReady() {
   return Boolean(config.accountSid && config.authToken && config.serviceSid);
 }
 
+function googleClientId() {
+  return process.env.GOOGLE_CLIENT_ID || process.env.REDX_GOOGLE_CLIENT_ID || "";
+}
+
 function normalizePhone(value) {
   const raw = String(value || "").trim();
   const digits = raw.replace(/\D/g, "");
@@ -491,6 +497,89 @@ function safeEqual(left, right) {
   const leftBuffer = Buffer.from(String(left));
   const rightBuffer = Buffer.from(String(right));
   return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+function base64UrlJson(value) {
+  return JSON.parse(Buffer.from(String(value).replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8"));
+}
+
+function fetchGoogleKeys() {
+  if (googleKeysCache.expiresAt > Date.now() && googleKeysCache.keys.length) {
+    return Promise.resolve(googleKeysCache.keys);
+  }
+
+  return new Promise((resolve, reject) => {
+    https.get("https://www.googleapis.com/oauth2/v3/certs", (res) => {
+      let body = "";
+      res.setEncoding("utf8");
+      res.on("data", (chunk) => {
+        body += chunk;
+      });
+      res.on("end", () => {
+        try {
+          const payload = JSON.parse(body);
+          const maxAge = /max-age=(\d+)/.exec(String(res.headers["cache-control"] || ""))?.[1];
+          googleKeysCache = {
+            keys: Array.isArray(payload.keys) ? payload.keys : [],
+            expiresAt: Date.now() + Number(maxAge || 3600) * 1000
+          };
+          resolve(googleKeysCache.keys);
+        } catch (error) {
+          reject(new Error("Could not read Google sign-in keys."));
+        }
+      });
+    }).on("error", () => reject(new Error("Could not reach Google sign-in.")));
+  });
+}
+
+async function verifyGoogleCredential(credential) {
+  const clientId = googleClientId();
+  if (!clientId) {
+    throw new Error("Google sign-in is not configured.");
+  }
+
+  const parts = String(credential || "").split(".");
+  if (parts.length !== 3) {
+    throw new Error("Google sign-in returned an invalid token.");
+  }
+
+  const [encodedHeader, encodedPayload, encodedSignature] = parts;
+  const header = base64UrlJson(encodedHeader);
+  const payload = base64UrlJson(encodedPayload);
+  if (header.alg !== "RS256") {
+    throw new Error("Google sign-in token uses an unsupported signature.");
+  }
+
+  const keys = await fetchGoogleKeys();
+  const jwk = keys.find((key) => key.kid === header.kid);
+  if (!jwk) {
+    throw new Error("Google sign-in key was not found.");
+  }
+
+  const signature = Buffer.from(encodedSignature.replace(/-/g, "+").replace(/_/g, "/"), "base64");
+  const verified = crypto.verify(
+    "RSA-SHA256",
+    Buffer.from(`${encodedHeader}.${encodedPayload}`),
+    crypto.createPublicKey({ key: jwk, format: "jwk" }),
+    signature
+  );
+
+  if (!verified) {
+    throw new Error("Google sign-in token could not be verified.");
+  }
+
+  const issuerOk = payload.iss === "https://accounts.google.com" || payload.iss === "accounts.google.com";
+  if (!issuerOk || payload.aud !== clientId || Number(payload.exp || 0) * 1000 < Date.now()) {
+    throw new Error("Google sign-in token is not valid for REDX.");
+  }
+
+  return {
+    sub: String(payload.sub || ""),
+    email: String(payload.email || ""),
+    emailVerified: payload.email_verified === true || payload.email_verified === "true",
+    name: String(payload.name || payload.email || "Google user"),
+    picture: String(payload.picture || "")
+  };
 }
 
 function twilioRequest(apiPath, formValues) {
@@ -607,6 +696,8 @@ async function handleApi(req, res, pathname) {
       ok: true,
       smsConfigured: smsProviderReady(),
       devOtpEnabled,
+      requireSmsOtp,
+      googleConfigured: Boolean(googleClientId()),
       httpsEnabled: Boolean(httpsOptions),
       database: "sqlite",
       databaseFile: path.basename(dbPath),
@@ -617,6 +708,26 @@ async function handleApi(req, res, pathname) {
       iceServerCount: rtcConfig.iceServers.length,
       liveRooms: liveRooms.size,
       liveSockets: wsClients.size
+    });
+    return;
+  }
+
+  if (pathname === "/api/auth-config" && req.method === "GET") {
+    jsonResponse(res, 200, {
+      ok: true,
+      requireSmsOtp,
+      googleClientId: googleClientId(),
+      googleConfigured: Boolean(googleClientId())
+    });
+    return;
+  }
+
+  if (pathname === "/api/auth/google" && req.method === "POST") {
+    const body = await readJson(req);
+    const profile = await verifyGoogleCredential(body.credential);
+    jsonResponse(res, 200, {
+      ok: true,
+      profile
     });
     return;
   }

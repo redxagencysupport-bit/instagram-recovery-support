@@ -80,13 +80,13 @@
         </div>
         <div class="auth-panel">
           <form class="auth-form" id="loginForm">
-            <input id="loginId" autocomplete="username" placeholder="Phone number or username" required>
+            <input id="loginId" autocomplete="username" placeholder="Email, phone, or username" required>
             <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" required>
             <button class="publish-button" type="submit">Log In</button>
             <button class="text-button forgot-button" type="button" id="forgotPassword">Forgot password?</button>
           </form>
           <form class="auth-form hidden" id="signupForm">
-            <input id="signupEmail" autocomplete="tel" inputmode="tel" placeholder="Mobile number (+1 317 555 0100)" required>
+            <input id="signupEmail" autocomplete="email" placeholder="Mobile number or email" required>
             <input id="signupName" autocomplete="name" placeholder="Full name" required>
             <input id="signupUsername" autocomplete="username" placeholder="Username" required>
             <small class="username-status" id="signupUsernameStatus">Username must be unique.</small>
@@ -94,11 +94,11 @@
             <button class="publish-button" type="submit">Sign Up</button>
           </form>
           <form class="auth-form hidden" id="resetForm">
-            <p class="auth-help">Enter your REDX username or mobile number. REDX will send an SMS code before changing the password.</p>
-            <input id="resetContact" autocomplete="username" placeholder="Mobile number or username" required>
+            <p class="auth-help">Enter your REDX username, email, or mobile number to change the password.</p>
+            <input id="resetContact" autocomplete="username" placeholder="Email, phone, or username" required>
             <input id="resetPassword" type="password" autocomplete="new-password" minlength="4" placeholder="New password" required>
             <input id="resetPasswordConfirm" type="password" autocomplete="new-password" minlength="4" placeholder="Confirm new password" required>
-            <button class="publish-button" type="submit">Send reset code</button>
+            <button class="publish-button" type="submit">Reset password</button>
           </form>
           <form class="auth-form hidden" id="otpForm">
             <p class="auth-help" id="otpHelp">Enter the 6-digit SMS security code.</p>
@@ -108,6 +108,11 @@
             <button class="text-button forgot-button" type="button" id="resendOtp">Resend code</button>
             <button class="text-button forgot-button" type="button" id="cancelOtp">Use different login</button>
           </form>
+        </div>
+        <div class="google-auth hidden" id="googleAuthWrap">
+          <div class="auth-divider"><span>or</span></div>
+          <div id="googleSignInButton"></div>
+          <small id="googleAuthHint"></small>
         </div>
         <button class="create-account-button" type="button" id="authModeButton">Create new account</button>
         <div class="auth-footer"><span>REDX</span></div>
@@ -569,6 +574,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="app.js"></script>
   </body>
 </html>

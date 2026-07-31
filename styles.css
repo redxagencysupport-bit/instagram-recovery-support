@@ -196,6 +196,40 @@ body.logged-out .auth-screen {
   font-size: 18px;
 }
 
+.google-auth {
+  display: grid;
+  gap: 16px;
+  margin: 10px 0 40px;
+}
+
+.auth-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+  color: #aeb9c8;
+  font-size: 14px;
+  font-weight: 720;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  background: #3a414d;
+}
+
+#googleSignInButton {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+#googleAuthHint {
+  color: #aeb9c8;
+  text-align: center;
+}
+
 .outline-login,
 .create-account-button {
   display: flex;

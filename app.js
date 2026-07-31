@@ -61,6 +61,8 @@ let profileTab = "posts";
 let activeTag = "";
 let toastTimer = 0;
 let pendingOtp = null;
+let authConfig = { requireSmsOtp: false, googleClientId: "", googleConfigured: false };
+let googleInitialized = false;
 let selectedThreadId = "";
 let currentStoryId = "";
 let liveStream = null;
@@ -165,6 +167,9 @@ const logoutButton = document.querySelector("#logoutButton");
 const authTitle = document.querySelector("#authTitle");
 const authBack = document.querySelector("#authBack");
 const forgotPassword = document.querySelector("#forgotPassword");
+const googleAuthWrap = document.querySelector("#googleAuthWrap");
+const googleSignInButton = document.querySelector("#googleSignInButton");
+const googleAuthHint = document.querySelector("#googleAuthHint");
 const messageList = document.querySelector("#messageList");
 const messageOwner = document.querySelector("#messageOwner");
 const messageSearchInput = document.querySelector("#messageSearchInput");
@@ -219,6 +224,10 @@ function cleanContact(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function isEmailContact(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanContact(value));
+}
+
 function toSmsPhone(value) {
   const raw = String(value || "").trim();
   const digits = raw.replace(/\D/g, "");
@@ -226,6 +235,23 @@ function toSmsPhone(value) {
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
   return "";
+}
+
+function uniqueUsername(seed, existingUsername = "") {
+  const taken = new Set(users
+    .map((user) => user.username)
+    .filter((username) => username && username !== existingUsername));
+  const base = cleanUsername(seed).replace(/^\.+|\.+$/g, "") || "redx.user";
+  let username = base;
+  let counter = 2;
+
+  while (taken.has(username)) {
+    const suffix = `.${counter}`;
+    username = `${base.slice(0, Math.max(1, 24 - suffix.length))}${suffix}`;
+    counter += 1;
+  }
+
+  return username;
 }
 
 function maskContact(value) {
@@ -381,6 +407,7 @@ function setAuthMode(mode) {
   authTitle.textContent = checkingOtp
     ? signupOtp ? "Verify your account" : resetOtp ? "Reset your password" : "Enter security code"
     : signingUp ? "Create new account" : resetting ? "Reset password" : "Log into REDX";
+  renderGoogleAuth();
 }
 
 function otpReturnMode() {
@@ -605,6 +632,100 @@ async function loadRtcConfig() {
   } catch (error) {
     rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
   }
+}
+
+async function loadAuthConfig() {
+  try {
+    const result = await apiGet("/api/auth-config");
+    authConfig = {
+      requireSmsOtp: result.requireSmsOtp === true,
+      googleClientId: result.googleClientId || "",
+      googleConfigured: result.googleConfigured === true
+    };
+  } catch (error) {
+    authConfig = { requireSmsOtp: false, googleClientId: "", googleConfigured: false };
+  }
+}
+
+function renderGoogleAuth() {
+  if (!googleAuthWrap) return;
+  const checkingOtp = authMode === "otp";
+  googleAuthWrap.hidden = checkingOtp || !authConfig.googleClientId;
+  googleAuthWrap.classList.toggle("hidden", googleAuthWrap.hidden);
+  googleAuthHint.textContent = authConfig.googleClientId ? "" : "Google sign-in needs GOOGLE_CLIENT_ID in Render.";
+  if (authConfig.googleClientId && !checkingOtp) {
+    initGoogleAuth();
+  }
+}
+
+function initGoogleAuth() {
+  if (googleInitialized || !authConfig.googleClientId || !googleSignInButton) return;
+  if (!window.google?.accounts?.id) {
+    setTimeout(initGoogleAuth, 350);
+    return;
+  }
+
+  googleInitialized = true;
+  window.google.accounts.id.initialize({
+    client_id: authConfig.googleClientId,
+    callback: handleGoogleCredential
+  });
+  window.google.accounts.id.renderButton(googleSignInButton, {
+    theme: "outline",
+    size: "large",
+    type: "standard",
+    shape: "pill",
+    text: "continue_with",
+    width: Math.min(360, googleSignInButton.clientWidth || 320)
+  });
+}
+
+async function handleGoogleCredential(response) {
+  try {
+    const result = await apiPost("/api/auth/google", {
+      credential: response.credential
+    });
+    completeGoogleAuth(result.profile);
+  } catch (error) {
+    showToast(error.message);
+  }
+}
+
+function completeGoogleAuth(profile) {
+  const email = cleanContact(profile?.email);
+  if (!email) {
+    showToast("Google did not return an email address.");
+    return;
+  }
+
+  let user = users.find((item) => item.googleSub === profile.sub || cleanContact(item.email) === email);
+  if (user) {
+    user.googleSub = profile.sub;
+    user.email = email;
+    user.name = profile.name || user.name || user.username;
+    user.avatar = profile.picture || user.avatar || "";
+    user.provider = "google";
+    user.settings = { ...defaults.settings, ...(user.settings || {}) };
+  } else {
+    const usernameSeed = email.split("@")[0] || profile.name || "google";
+    user = {
+      username: uniqueUsername(usernameSeed),
+      name: String(profile.name || usernameSeed).slice(0, 32),
+      bio: defaults.account.bio,
+      avatar: profile.picture || "",
+      followers: [],
+      following: [],
+      email,
+      phone: "",
+      password: "",
+      provider: "google",
+      googleSub: profile.sub,
+      settings: { ...defaults.settings }
+    };
+    users.push(user);
+  }
+
+  completeAuth(user, `Signed in with Google as ${user.username}.`);
 }
 
 function persist() {
@@ -2445,15 +2566,29 @@ settingsForm.addEventListener("submit", (event) => {
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const user = findUser(loginId.value);
-  if (!user || user.password !== loginPassword.value) {
+  if (!user) {
     showToast("Incorrect username or password.");
     return;
   }
 
-  const sent = await startOtpLogin(user);
-  if (sent) {
-    loginPassword.value = "";
+  if (!user.password && user.provider === "google") {
+    showToast("Use Google sign-in for this account.");
+    return;
   }
+
+  if (user.password !== loginPassword.value) {
+    showToast("Incorrect username or password.");
+    return;
+  }
+
+  if (authConfig.requireSmsOtp && toSmsPhone(user.phone || user.email)) {
+    const sent = await startOtpLogin(user);
+    if (sent) loginPassword.value = "";
+    return;
+  }
+
+  loginPassword.value = "";
+  completeAuth(user, `Welcome back, ${user.username}.`);
 });
 
 otpForm.addEventListener("submit", async (event) => {
@@ -2543,10 +2678,12 @@ otpForm.addEventListener("submit", async (event) => {
 signupForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const username = cleanUsername(signupUsername.value);
-  const phone = toSmsPhone(signupEmail.value);
+  const contact = cleanContact(signupEmail.value);
+  const phone = toSmsPhone(contact);
+  const email = isEmailContact(contact) ? contact : "";
 
-  if (!phone) {
-    showToast("Enter a valid mobile number, like +1 317 555 0100.");
+  if (!phone && !email) {
+    showToast("Enter a valid email or mobile number.");
     return;
   }
 
@@ -2555,8 +2692,13 @@ signupForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  if (users.some((user) => toSmsPhone(user.phone || user.email) === phone)) {
+  if (phone && users.some((user) => toSmsPhone(user.phone || user.email) === phone)) {
     showToast("That phone number already has an account.");
+    return;
+  }
+
+  if (email && users.some((user) => cleanContact(user.email) === email)) {
+    showToast("That email already has an account.");
     return;
   }
 
@@ -2568,12 +2710,24 @@ signupForm.addEventListener("submit", async (event) => {
     followers: [],
     following: [],
     phone,
-    email: phone,
+    email: email || phone,
     password: signupPassword.value,
+    provider: "password",
     settings: { ...defaults.settings }
   };
 
-  await startOtpSignup(user);
+  if (authConfig.requireSmsOtp) {
+    if (!phone) {
+      showToast("SMS OTP is enabled. Sign up with a mobile number.");
+      return;
+    }
+    await startOtpSignup(user);
+    return;
+  }
+
+  users.push(user);
+  signupForm.reset();
+  completeAuth(user, `Account created for ${user.username}.`);
 });
 
 resetForm.addEventListener("submit", async (event) => {
@@ -2582,12 +2736,12 @@ resetForm.addEventListener("submit", async (event) => {
   const nextPassword = resetPassword.value;
 
   if (!user) {
-    showToast("No REDX account found for that username or phone.");
+    showToast("No REDX account found for that username, email, or phone.");
     return;
   }
 
-  if (!toSmsPhone(user.phone || user.email)) {
-    showToast("This account does not have a verified phone number.");
+  if (!user.password && user.provider === "google") {
+    showToast("Use Google sign-in for this account.");
     return;
   }
 
@@ -2601,7 +2755,18 @@ resetForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  await startOtpReset(user, nextPassword);
+  if (authConfig.requireSmsOtp) {
+    if (!toSmsPhone(user.phone || user.email)) {
+      showToast("This account does not have a phone number for SMS reset.");
+      return;
+    }
+    await startOtpReset(user, nextPassword);
+    return;
+  }
+
+  user.password = nextPassword;
+  resetForm.reset();
+  completeAuth(user, `Password reset for ${user.username}.`);
 });
 
 authModeButton.addEventListener("click", () => {
@@ -2728,7 +2893,7 @@ document.querySelector("#resetDemo").addEventListener("click", async () => {
 });
 
 async function bootRedx() {
-  await Promise.all([loadDatabaseState(), loadRtcConfig()]);
+  await Promise.all([loadDatabaseState(), loadRtcConfig(), loadAuthConfig()]);
   renderAuthState();
   renderAll();
   setInterval(refreshLiveSessionsFromDatabase, 7000);

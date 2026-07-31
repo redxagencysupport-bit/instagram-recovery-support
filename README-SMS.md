@@ -1,21 +1,45 @@
-# REDX SMS OTP Setup
+# REDX Auth, SMS OTP, and Live Setup
 
-REDX now uses a Node backend for OTP. The browser never stores SMS provider secrets.
+REDX can run in free auth mode without SMS. The browser never stores SMS provider secrets.
 
-## Real SMS
+## Free Auth Mode
 
-1. Copy `.env.example` to `.env`.
-2. Create a Twilio Verify Service.
-3. Fill these values in `.env`:
+Use this on Render when you do not want to pay for SMS:
 
 ```env
+REDX_REQUIRE_SMS_OTP=false
+REDX_DEV_OTP=false
+REDX_OTP_SECRET=replace-this-with-a-long-random-string
+```
+
+With this mode, users can create accounts and log in with:
+
+```text
+username/email + password
+```
+
+Optional Google sign-in can be enabled with:
+
+```env
+GOOGLE_CLIENT_ID=your-google-oauth-web-client-id.apps.googleusercontent.com
+```
+
+## Optional Real SMS OTP
+
+Only use this if you want SMS security codes and have a paid-capable SMS setup.
+
+1. Create a Twilio Verify Service.
+2. Fill these values in `.env` or Render Environment Variables:
+
+```env
+REDX_REQUIRE_SMS_OTP=true
 TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=...
 TWILIO_VERIFY_SERVICE_SID=VA...
 REDX_DEV_OTP=false
 ```
 
-4. Start REDX:
+3. Start REDX:
 
 ```powershell
 cd C:\Users\rofik\Documents\Codex\2026-07-29\hi\outputs\redx
@@ -30,7 +54,7 @@ http://localhost:3000
 
 ## Local Test Mode
 
-If you do not have Twilio keys yet, set `REDX_DEV_OTP=true` in `.env`.
+If you specifically want to test the SMS-code screen without Twilio, set `REDX_REQUIRE_SMS_OTP=true` and `REDX_DEV_OTP=true` in `.env`.
 The server will print the OTP in the terminal and the browser may show it as a local dev code.
 
 ## Database
